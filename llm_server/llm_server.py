@@ -27,10 +27,10 @@ class LLMServerRunner:
     def stop_server(self):
 
         if self.process and self.process.poll() is None:
-            logger.info("⛔ Остановка сервера...")
+            logger.info("Остановка сервера...")
             self.process.terminate()
             self.process.wait()
-        logger.success("Работа сервера завершена! ✅")
+        logger.success("Работа сервера завершена!")
 
     def restart_server(self):
 
@@ -61,7 +61,7 @@ class LLMServerRunner:
         for i in (self.llama_path, self.llama_flags, model_path, flags, api):
             command += i + " "
         logger.info(command)
-        logger.info(f"🚀 Запуск сервера: {self.strategy.get_name()}")
+        logger.info(f"Запуск сервера: {self.strategy.get_name()}")
 
         try:
             self.process = subprocess.Popen(
