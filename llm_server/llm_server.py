@@ -30,6 +30,7 @@ class LLMServerRunner:
             logger.info("⛔ Остановка сервера...")
             self.process.terminate()
             self.process.wait()
+        logger.success("Работа сервера завершена! ✅")
 
     def restart_server(self):
 
@@ -48,7 +49,6 @@ class LLMServerRunner:
     def start_server(self):
 
         model_path = self.strategy.get_path()
-        api = f"--api-key {self.psswrd}"
         flags = self.strategy.get_flags()
         logger.info(model_path)
         if not os.path.exists(model_path):
@@ -57,6 +57,7 @@ class LLMServerRunner:
         if not os.path.exists(self.llama_path):
             raise FileNotFoundError("llama-server.exe не найден")
         command = ""
+        api = f"--api-key {self.psswrd}"
         for i in (self.llama_path, self.llama_flags, model_path, flags, api):
             command += i + " "
         logger.info(command)
@@ -76,6 +77,7 @@ class LLMServerRunner:
             log_thread = threading.Thread(target=self._log_reader, daemon=True)
 
             log_thread.start()
+            logger.success("Сервер успешно запущен! 😎")
 
         except Exception as e:
             logger.error(f"Ошибка запуска сервера: {e}")

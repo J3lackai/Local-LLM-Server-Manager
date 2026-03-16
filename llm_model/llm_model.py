@@ -3,13 +3,14 @@ from loguru import logger
 
 
 # ======================
-# 2. стратегия: Qwen3-30B
+# 2. Модель для стратегии
 # ======================
-class Qwen_30B(LLMStrategy):
-    def __init__(self, dict: dict):
+class LLMModel(LLMStrategy):
+    def __init__(self, name, dict: dict):
         try:
-            self.model_path = dict["qwen_path"]
-            self.flags = dict["qwen_flags"]
+            self.name = name
+            self.model_path = dict[name + "_path"]
+            self.flags = dict[name + "_flags"]
         except Exception as e:
             self.model_path = ""
             self.flags = ""

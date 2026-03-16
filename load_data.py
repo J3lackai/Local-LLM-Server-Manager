@@ -10,23 +10,24 @@ def get_name_llm(llm_path: str) -> str:
 def get_config_data(
     path="config.ini",
     encoding="utf-8",
-    suffixes=("_flags", "_path"),
 ) -> tuple[str, str, dict[str, str]]:
     config = ConfigParser()
     config.read(path, encoding)
 
     config_main = config["Main"]
+    default_llm = config_main["default_llm"]
     llama_flags = config_main["flags"]
     llama_path = config_main["server_path"]
-
+    names_llm = config_main["llm_list"]
     dict_llm = {}
+    for section in config.sections():
+        if section == "Main":
+            continue
+        for key, value in config[section].items():
+            dict_key = section + "_" + key
+            dict_llm[dict_key] = value
 
-    for key, value in config_main.items():
-        for suffix in suffixes:
-            if key.endswith(suffix):
-                dict_llm[key] = value
-
-    return llama_path, llama_flags, dict_llm
+    return llama_path, llama_flags, default_llm, names_llm, dict_llm
 
 
 def get_env_data() -> str:
