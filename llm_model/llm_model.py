@@ -23,5 +23,4 @@ class LLMModel(LLMStrategy):
         return self.flags
 
     def get_name(self) -> str:
-        list_llm_path = self.model_path.split("\\")
-        return list_llm_path[-2] if len(list_llm_path) >= 2 else ""
+        return self.name

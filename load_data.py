@@ -1,4 +1,5 @@
 import os
+import ast
 from configparser import ConfigParser
 
 
@@ -19,6 +20,7 @@ def get_config_data(
     llama_flags = config_main["flags"]
     llama_path = config_main["server_path"]
     names_llm = config_main["llm_list"]
+    dict_cmds = ast.literal_eval(config_main["dict_cmds"])
     dict_llm = {}
     for section in config.sections():
         if section == "Main":
@@ -27,7 +29,7 @@ def get_config_data(
             dict_key = section + "_" + key
             dict_llm[dict_key] = value
 
-    return llama_path, llama_flags, default_llm, names_llm, dict_llm
+    return llama_path, llama_flags, default_llm, names_llm, dict_llm, dict_cmds
 
 
 def get_env_data() -> str:

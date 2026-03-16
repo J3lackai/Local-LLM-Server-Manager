@@ -77,7 +77,6 @@ class LLMServerRunner:
             log_thread = threading.Thread(target=self._log_reader, daemon=True)
 
             log_thread.start()
-            logger.success("Сервер успешно запущен! 😎")
-
+            logger.info("Скоро сервер запустится...")
         except Exception as e:
             logger.error(f"Ошибка запуска сервера: {e}")
