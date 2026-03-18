@@ -3,6 +3,8 @@ import os
 import subprocess
 from loguru import logger
 import threading
+from time import sleep
+import psutil
 
 
 class ServerData:
@@ -25,12 +27,22 @@ class LLMServerRunner:
         self.process = None
 
     def stop_server(self):
+        if self.process:
+            # Принудительно убиваем процесс и его дочерние процессы (если есть)
+            parent_pid = self.process.pid
 
-        if self.process and self.process.poll() is None:
-            logger.info("Остановка сервера...")
-            self.process.terminate()
-            self.process.wait()
-        logger.success("Работа сервера завершена!")
+            for child in psutil.Process(parent_pid).children(recursive=True):
+                logger.info(f"Завершение процесса-ребенка PID {child.pid}...")
+
+        # Убиваем основной процесс принудительно (если terminate не сработал)
+        self.process.kill()  # Более жёсткое завершение, чем terminate()
+
+        if hasattr(self, "process"):
+            sleep(1.5)
+        self.process = None
+
+        # Пауза для освобождения VRAM на ROCm (важно!)
+        sleep(1)
 
     def restart_server(self):
 
