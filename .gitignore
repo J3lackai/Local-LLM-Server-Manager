@@ -1,9 +1,9 @@
 /venv
 /__pycache__
-//llm_model//__pycache__
 /llm_server/__pycache__
 /llm_strategy/__pycache__
 /output
 *.env
 *.pyc
 *.json
+*/__pycache__
