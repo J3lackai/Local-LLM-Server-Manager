@@ -1,8 +1,9 @@
 from loguru import logger
 from llm_model import LLMModel
-from llm_server import LLMServerRunner
 from keyboard import wait
-from time import sleep
+import msvcrt
+import time as t
+import sys
 
 
 def beautiful_exit():
@@ -11,23 +12,38 @@ def beautiful_exit():
     exit()
 
 
-def wait_for_input(names_llm):
-    try:
-        logger.info(
-            "Введите название модели LLM для запуска\nЗапуск дефолтной модели через 15 сек..."
-        )
-        for i in range(int(15), -1, -1):
-            if i > 0:
-                logger.info(f"Осталось секунд: {i}")  # Пишет в лог без блокировки ввода
-            cmd = input(">>> ").strip().lower()
-            if cmd in names_llm:
-                return cmd
-            sleep(5)
-    except KeyboardInterrupt:
-        beautiful_exit()
+def input_with_timeout(
+    prompt: str,
+    timeout: float,
+    names_llm: str,
+    log_delay=5,
+    timer=t.monotonic,
+):
+    logger.info(prompt)
+    sys.stdout.flush()
+    endtime = timer() + timeout
+    result = []
+    i = 0
+    while timer() < endtime:
+        if msvcrt.kbhit():
+            result.append(msvcrt.getwche())
+            if result[-1] == "\r":
+                cmd = "".join(result[:-1])
+                if cmd in names_llm:
+                    return cmd
+                cmd = ""
+                logger.error(
+                    f"Неизвестная языковая модель: {cmd} Доступные: {names_llm}"
+                )
+
+        t.sleep(0.04)  # just to yield to other processes/threads
+        if i % (24 * log_delay) == 0:
+            # i % 24 Приблизительно 1 секунда задержки на вывод следующего сообщения
+            logger.info(f"Осталось времени: {int(endtime - timer())}")
+        i += 1
 
 
-def cli(runner: LLMServerRunner, names_llm, dict_cmds, dict_llm) -> None:
+def cli(runner, names_llm, dict_cmds, dict_llm) -> None:
     try:
         while True:
             cmd = input(">>> ").strip().lower()
@@ -53,4 +69,5 @@ def cli(runner: LLMServerRunner, names_llm, dict_cmds, dict_llm) -> None:
                     runner.restart_server()
     except KeyboardInterrupt:
         runner.stop_server()
+        logger.info("Программа завершена вводом: Ctrl + C")
         beautiful_exit()

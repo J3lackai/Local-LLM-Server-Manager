@@ -1,3 +1,3 @@
-from .cli_methods import cli, beautiful_exit, wait_for_input
+from .cli_methods import cli, beautiful_exit, input_with_timeout
 
-__all__ = ["cli", "beautiful_exit", "wait_for_input"]
+__all__ = ["cli", "beautiful_exit", "input_with_timeout"]

@@ -5,6 +5,7 @@ from loguru import logger
 import threading
 from time import sleep
 import psutil
+from CLI import beautiful_exit
 
 
 class ServerData:
@@ -59,23 +60,22 @@ class LLMServerRunner:
             logger.info(line.strip())
 
     def start_server(self):
-
-        model_path = self.strategy.get_path()
-        flags = self.strategy.get_flags()
-        logger.info(model_path)
-        if not os.path.exists(model_path):
-            raise FileNotFoundError("Модель не найдена")
-
-        if not os.path.exists(self.llama_path):
-            raise FileNotFoundError("llama-server.exe не найден")
-        command = ""
-        api = f"--api-key {self.psswrd}"
-        for i in (self.llama_path, self.llama_flags, model_path, flags, api):
-            command += i + " "
-        logger.info(command)
-        logger.info(f"Запуск сервера: {self.strategy.get_name()}")
-
         try:
+            model_path = self.strategy.get_path()
+            flags = self.strategy.get_flags()
+            logger.info(model_path)
+            if not os.path.exists(model_path):
+                raise FileNotFoundError("Модель не найдена")
+
+            if not os.path.exists(self.llama_path):
+                raise FileNotFoundError("llama-server.exe не найден")
+            command = ""
+            api = f"--api-key {self.psswrd}"
+            for i in (self.llama_path, self.llama_flags, model_path, flags, api):
+                command += i + " "
+            logger.info(command)
+            logger.info(f"Запуск сервера: {self.strategy.get_name()}")
+
             self.process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
@@ -90,5 +90,11 @@ class LLMServerRunner:
 
             log_thread.start()
             logger.info("Скоро сервер запустится...")
+
+        except KeyboardInterrupt:
+            self.stop_server()
+            logger.info("Программа завершена вводом: Ctrl + C")
+            beautiful_exit()
         except Exception as e:
+            self.stop_server()
             logger.error(f"Ошибка запуска сервера: {e}")
