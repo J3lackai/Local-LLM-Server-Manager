@@ -19,6 +19,15 @@ def input_with_timeout(
     log_delay=5,
     timer=t.monotonic,
 ):
+    # timeout: Время до запуска дефолтной модели из конфига
+    # log_delay: сколько ждём перед выводом сообщения сколько секунд осталось
+    # функция ввода данных с таймером
+    if log_delay > timeout:
+        log_delay = 5
+        logger.warning("Ошибка: log_delay > timeout. Указали log_delay = 5")
+    if names_llm in ("[]", ""):
+        logger.critical("Добавьте хотя бы одну модель в конфиг перед запуском!")
+        return None
     logger.info(prompt)
     sys.stdout.flush()
     endtime = timer() + timeout
@@ -28,13 +37,12 @@ def input_with_timeout(
         if msvcrt.kbhit():
             result.append(msvcrt.getwche())
             if result[-1] == "\r":
+                # Посимвольно джойним из списка, ожидаем название модели
                 cmd = "".join(result[:-1])
                 if cmd in names_llm:
                     return cmd
-                cmd = ""
-                logger.error(
-                    f"Неизвестная языковая модель: {cmd} Доступные: {names_llm}"
-                )
+                cmd = ""  # Неправильное название, сброс
+                logger.error(f"Неизвестная LLM: {cmd} Доступные: {names_llm}")
 
         t.sleep(0.04)  # just to yield to other processes/threads
         if i % (24 * log_delay) == 0:
@@ -45,6 +53,7 @@ def input_with_timeout(
 
 def cli(runner, names_llm, dict_cmds, dict_llm) -> None:
     try:
+        # Реализация функции ввода команд в консоль
         while True:
             cmd = input(">>> ").strip().lower()
             if cmd == runner.strategy.name:
