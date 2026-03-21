@@ -41,8 +41,8 @@ def input_with_timeout(
                 cmd = "".join(result[:-1])
                 if cmd in names_llm:
                     return cmd
+                logger.error(f"Неизвестная LLM: {cmd}; Доступные: {names_llm}")
                 cmd = ""  # Неправильное название, сброс
-                logger.error(f"Неизвестная LLM: {cmd} Доступные: {names_llm}")
 
         t.sleep(0.04)  # just to yield to other processes/threads
         if i % (24 * log_delay) == 0:
@@ -72,7 +72,7 @@ def cli(runner, names_llm, dict_cmds, dict_llm) -> None:
                 logger.info(f"Текущая модель: {runner.strategy.get_name()}")
             else:
                 if cmd not in names_llm:
-                    logger.error(f"Неизвестная языковая модель\nДоступные: {names_llm}")
+                    logger.error(f"Неизвестная LLM: {cmd}; Доступные: {names_llm}")
                 else:
                     runner.set_strategy(LLMModel(cmd, dict_llm))
                     runner.restart_server()
