@@ -11,12 +11,20 @@ if __name__ == "__main__":
         add_logger()
         # Настраиваем компактный формат
 
-        llama_path, llama_flags, default_llm, names_llm, dict_llm, dict_cmds = (
-            get_config_data("config.ini", "utf-8")
-        )
+        (
+            llama_path,
+            llama_flags,
+            default_llm,
+            names_llm,
+            dict_llm,
+            dict_cmds,
+            timeout,
+        ) = get_config_data("config.ini", "utf-8")
         psswrd = get_env_data()
         cmd = input_with_timeout(
-            prompt="Напишите название LLM для запуска:", timeout=15, names_llm=names_llm
+            prompt="Напишите название LLM для запуска:",
+            timeout=timeout,
+            names_llm=names_llm,
         )
         strategy = LLMModel(default_llm if (cmd is None) else cmd, dict_llm)
         server_data = ServerData(llama_path, llama_flags)
