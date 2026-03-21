@@ -11,7 +11,7 @@ def get_name_llm(llm_path: str) -> str:
 def get_config_data(
     path="config.ini",
     encoding="utf-8",
-) -> tuple[str, str, dict[str, str]]:
+) -> tuple[str, str, str, tuple, dict[str, str], dict[str, str]]:
     config = ConfigParser()
     config.read(path, encoding)
 
@@ -19,7 +19,13 @@ def get_config_data(
     default_llm = config_main["default_llm"]
     llama_flags = config_main["flags"]
     llama_path = config_main["server_path"]
-    names_llm = config_main["llm_list"]
+    names_llm = tuple(
+        (config_main["llm_list"])
+        .replace("[", "")
+        .replace("]", "")
+        .replace(" ", "")
+        .split(",")
+    )
     dict_cmds = ast.literal_eval(config_main["dict_cmds"])
     dict_llm = {}
     for section in config.sections():

@@ -36,7 +36,8 @@ class LLMServerRunner:
                 logger.info(f"Завершение процесса-ребенка PID {child.pid}...")
 
         # Убиваем основной процесс принудительно (если terminate не сработал)
-        self.process.kill()  # Более жёсткое завершение, чем terminate()
+        if self.process is not None:
+            self.process.kill()  # Более жёсткое завершение, чем terminate()
 
         if hasattr(self, "process"):
             sleep(1.5)
@@ -70,10 +71,15 @@ class LLMServerRunner:
             if not os.path.exists(self.llama_path):
                 raise FileNotFoundError("llama-server.exe не найден")
             command = ""
-            api = f"--api-key {self.psswrd}"
-            for i in (self.llama_path, self.llama_flags, model_path, flags, api):
+            for i in (
+                self.llama_path,
+                self.llama_flags,
+                model_path,
+                flags,
+                "--api-key",
+                self.psswrd,
+            ):
                 command += i + " "
-            logger.info(command)
             logger.info(f"Запуск сервера: {self.strategy.get_name()}")
 
             self.process = subprocess.Popen(

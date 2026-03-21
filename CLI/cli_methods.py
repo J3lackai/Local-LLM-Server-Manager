@@ -9,13 +9,13 @@ import sys
 def beautiful_exit():
     logger.info("Нажмите 'Enter' для завершения программы.")
     wait("enter")
-    exit()
+    sys.exit()
 
 
 def input_with_timeout(
     prompt: str,
     timeout: float,
-    names_llm: str,
+    names_llm: tuple,
     log_delay=5,
     timer=t.monotonic,
 ):
@@ -25,7 +25,7 @@ def input_with_timeout(
     if log_delay > timeout:
         log_delay = 5
         logger.warning("Ошибка: log_delay > timeout. Указали log_delay = 5")
-    if names_llm in ("[]", ""):
+    if len(names_llm) == 0:
         logger.critical("Добавьте хотя бы одну модель в конфиг перед запуском!")
         return None
     logger.info(prompt)
