@@ -14,6 +14,7 @@ class CLISettings:
 
 @dataclass
 class CMDParameters:
+    backend: str
     llama_path: str
     llama_flags: str
 
@@ -36,9 +37,13 @@ def get_config_data(
     config.read(path, encoding)
 
     config_main = config["Main"]
+    server_path = config_main["server_path"]
+    if not os.path.exists(server_path):
+        raise FileNotFoundError("llama-server.exe не найден")
     cmd_p = CMDParameters(
-        llama_path=config_main["server_path"],
+        llama_path=server_path,
         llama_flags=config_main["flags"],
+        backend=config_main["backend"],
     )
     names_llm = tuple(
         (config_main["llm_list"])

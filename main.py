@@ -20,7 +20,7 @@ if __name__ == "__main__":
         )
         cmd = cmd if cmd is not None else cli_s.default_llm
         strategy = LLMModel(cmd, llm_s.dict_llm)
-        server_data = ServerData(cmd_p.llama_path, cmd_p.llama_flags)
+        server_data = ServerData(cmd_p.llama_path, cmd_p.llama_flags, cmd_p.backend)
         runner = LLMServerRunner(strategy, server_data, psswrd)
         runner.start_server()
         cli(runner, cli_s.names_llm, cli_s.dict_cmds, llm_s.dict_llm)

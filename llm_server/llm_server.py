@@ -9,9 +9,10 @@ from CLI import beautiful_exit
 
 
 class ServerData:
-    def __init__(self, llama_path: str, llama_flags: str):
+    def __init__(self, llama_path: str, llama_flags: str, backend: str):
         self.llama_path = llama_path
         self.llama_flags = llama_flags
+        self.backend = backend
 
 
 # ======================
@@ -24,6 +25,7 @@ class LLMServerRunner:
         self.strategy = strategy
         self.llama_path = server_data.llama_path
         self.llama_flags = server_data.llama_flags
+        self.rocm = True if server_data.backend == "rocm" else False
         self.psswrd = psswrd
         self.process = None
 
@@ -44,7 +46,7 @@ class LLMServerRunner:
         self.process = None
 
         # Пауза для освобождения VRAM на ROCm (важно!)
-        sleep(1)
+        sleep(2)
 
     def restart_server(self):
 
@@ -67,9 +69,6 @@ class LLMServerRunner:
             logger.info(model_path)
             if not os.path.exists(model_path):
                 raise FileNotFoundError("Модель не найдена")
-
-            if not os.path.exists(self.llama_path):
-                raise FileNotFoundError("llama-server.exe не найден")
             command = ""
             for i in (
                 self.llama_path,
@@ -81,7 +80,8 @@ class LLMServerRunner:
             ):
                 command += i + " "
             logger.info(f"Запуск сервера: {self.strategy.get_name()}")
-
+            if self.rocm:
+                os.environ["HIP_VISIBLE_DEVICES"] = "0"
             self.process = subprocess.Popen(
                 command,
                 stdout=subprocess.PIPE,
