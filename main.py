@@ -2,7 +2,7 @@ from llm_model import LLMModel
 from utils import get_config_data, get_env_data, add_logger
 from llm_server import LLMServerRunner, ServerData
 from loguru import logger
-from CLI import cli, input_with_timeout, beautiful_exit
+from CLI import cli, input_llm_name_timeout, beautiful_exit
 
 if __name__ == "__main__":
     try:
@@ -13,12 +13,12 @@ if __name__ == "__main__":
 
         cmd_p, cli_s, llm_s = get_config_data("config.ini", "utf-8")
         psswrd = get_env_data()
-        cmd = input_with_timeout(
-            prompt="Напишите название LLM для запуска:",
-            timeout=cli_s.timeout,
-            names_llm=cli_s.names_llm,
+        prompt = (
+            f"Напишите название LLM для запуска, Осталось {cli_s.timeout} секунд.\n>>"
         )
-        cmd = cmd if cmd is not None else cli_s.default_llm
+        cmd = input_llm_name_timeout(prompt, cli_s.timeout, cli_s)
+        if cmd is None:
+            logger.critical("Ошибка во время выполнения input_with_timeout")
         strategy = LLMModel(cmd, llm_s.dict_llm)
         server_data = ServerData(cmd_p.llama_path, cmd_p.llama_flags, cmd_p.backend)
         runner = LLMServerRunner(strategy, server_data, psswrd)
@@ -30,9 +30,9 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Программа завершена вводом: Ctrl + C")
         beautiful_exit()
-    except WindowsError:
-        logger.critical(f"Не найдена директория: {cmd_p.llama_path}")
+    except WindowsError as e:
+        logger.critical(f"Ошибка: {e}")
         beautiful_exit()
     except Exception as e:
-        logger.error(f"Неизвестная ошибка{e}")
+        logger.error(f"Неизвестная ошибка: {e}")
         beautiful_exit()

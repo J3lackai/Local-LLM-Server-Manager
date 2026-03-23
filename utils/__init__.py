@@ -1,4 +1,4 @@
-from .load_data import get_config_data, get_env_data, get_name_llm
+from .load_data import get_config_data, get_env_data, get_name_llm, CLISettings
 from .setup_logger import truncate_message, add_logger
 
 __all__ = [
@@ -7,4 +7,5 @@ __all__ = [
     "get_name_llm",
     "truncate_message",
     "add_logger",
+    "CLISettings",
 ]

@@ -1,9 +1,9 @@
 from loguru import logger
 from llm_model import LLMModel
 from keyboard import wait
-import msvcrt
-import time as t
 import sys
+from input_with_timeout import input_with_timeout
+from utils import CLISettings
 
 
 def beautiful_exit():
@@ -12,43 +12,26 @@ def beautiful_exit():
     sys.exit()
 
 
-def input_with_timeout(
-    prompt: str,
-    timeout: float,
-    names_llm: tuple,
-    log_delay=5,
-    timer=t.monotonic,
-):
-    # timeout: Время до запуска дефолтной модели из конфига
-    # log_delay: сколько ждём перед выводом сообщения сколько секунд осталось
-    # функция ввода данных с таймером
-    if log_delay > timeout:
-        log_delay = 5
-        logger.warning("Ошибка: log_delay > timeout. Указали log_delay = 5")
-    if len(names_llm) == 0:
-        logger.critical("Добавьте хотя бы одну модель в конфиг перед запуском!")
-        return None
-    logger.info(prompt)
-    sys.stdout.flush()
-    endtime = timer() + timeout
-    result = []
-    i = 0
-    while timer() < endtime:
-        if msvcrt.kbhit():
-            result.append(msvcrt.getwche())
-            if result[-1] == "\r":
-                # Посимвольно джойним из списка, ожидаем название модели
-                cmd = "".join(result[:-1])
-                if cmd in names_llm:
-                    return cmd
-                logger.error(f"Неизвестная LLM: {cmd}; Доступные: {names_llm}")
-                cmd = ""  # Неправильное название, сброс
-
-        t.sleep(0.04)  # just to yield to other processes/threads
-        if i % (24 * log_delay) == 0:
-            # i % 24 Приблизительно 1 секунда задержки на вывод следующего сообщения
-            logger.info(f"Осталось времени: {int(endtime - timer())}")
-        i += 1
+def input_llm_name_timeout(prompt: str, timeout: float, cli_s: CLISettings):
+    if cli_s is None:
+        logger.critical("Ошибка: cli_s не может быть None")
+        raise (TimeoutError)
+    try:
+        cmd = input_with_timeout(prompt, timeout)
+        if cmd not in cli_s.names_llm:
+            cmd = cli_s.default_llm
+            logger.warning(f"Модель {cmd} не найдена среди моделей: {cli_s.names_llm}")
+            logger.warning(f"Выбрана дефолтная модель: {cli_s.default_llm}")
+            return cmd
+    except TimeoutError:
+        logger.warning("Вы не ввели название модели")
+    except ValueError:
+        logger.warning("Ошибка: timeout должен быть > 0")
+    except TypeError:
+        logger.warning("Ошибка: timeout должен быть одним из типов: int, float, None")
+    logger.warning(f"Выбрана дефолтная модель: {cli_s.default_llm}")
+    cmd = cli_s.default_llm
+    return cmd
 
 
 def cli(runner, names_llm, dict_cmds, dict_llm) -> None:
