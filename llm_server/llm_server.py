@@ -30,23 +30,19 @@ class LLMServerRunner:
         self.process = None
 
     def stop_server(self):
+        self.process.terminate()
         if self.process:
             # Принудительно убиваем процесс и его дочерние процессы (если есть)
             parent_pid = self.process.pid
 
-            for child in psutil.Process(parent_pid).children(recursive=True):
-                logger.info(f"Завершение процесса-ребенка PID {child.pid}...")
-
         # Убиваем основной процесс принудительно (если terminate не сработал)
         if self.process is not None:
             self.process.kill()  # Более жёсткое завершение, чем terminate()
-
-        if hasattr(self, "process"):
-            sleep(1.5)
         self.process = None
 
         # Пауза для освобождения VRAM на ROCm (важно!)
         sleep(2)
+        logger.success("Сервер успешно завершил работу")
 
     def restart_server(self):
 

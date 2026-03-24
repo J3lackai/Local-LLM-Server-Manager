@@ -6,7 +6,8 @@ from dataclasses import dataclass
 
 @dataclass
 class CLISettings:
-    timeout: int
+    timeout_before_start: float
+    timeout_load_server: float
     names_llm: tuple
     dict_cmds: dict
     default_llm: str
@@ -54,7 +55,8 @@ def get_config_data(
     )
     dict_cmds = ast.literal_eval(config_main["dict_cmds"])
     cli_s = CLISettings(
-        timeout=float(config_main["timeout"]),
+        timeout_before_start=float(config_main["timeout_before_start"]),
+        timeout_load_server=float(config_main["timeout_load_server"]),
         names_llm=names_llm,
         dict_cmds=dict_cmds,
         default_llm=config_main["default_llm"],
