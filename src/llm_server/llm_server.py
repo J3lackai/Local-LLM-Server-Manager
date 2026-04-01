@@ -4,7 +4,6 @@ import subprocess
 from loguru import logger
 import threading
 from time import sleep
-import psutil
 from CLI import beautiful_exit
 
 
