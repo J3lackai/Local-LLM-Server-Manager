@@ -1,7 +1,9 @@
 import os
 import ast
+from configparser import Error
 from configparser import ConfigParser
 from dataclasses import dataclass
+from loguru import logger
 
 
 @dataclass
@@ -34,6 +36,23 @@ def get_config_data(
     path="config.ini",
     encoding="utf-8",
 ) -> tuple[CMDParameters, CLISettings, LLMSettings]:
+    def ensure_right_config(path="config.ini") -> ConfigParser:
+
+        config = ConfigParser()
+        # Проверяем есть ли конфиг в директории скрипта
+        if not os.path.exists("config.ini"):
+            logger.critical(
+                "Ошибка: Не найден файл 'config.ini', создайте его в директории проекта!"
+            )
+            raise Error
+        try:
+            config.read(path, encoding="utf-8")
+        except Error as e:
+            logger.critical(f"Ошибка при чтении файла конфигурации 'config.ini': {e}.")
+            raise Error
+        return config
+
+    config = ensure_right_config(path=path)
     config = ConfigParser()
     config.read(path, encoding)
 
