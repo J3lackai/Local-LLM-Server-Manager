@@ -17,20 +17,22 @@ def input_llm_name_timeout(prompt: str, timeout: float, cli_s: CLISettings):
         logger.critical("Ошибка: cli_s не может быть None")
         raise (TimeoutError)
     try:
+        cancel = {"no", "none", "n"}
         cmd = input_with_timeout(prompt, timeout)
+        if cmd.lower() in cancel:
+            return "n"
         if cmd not in cli_s.names_llm:
-            cmd = cli_s.default_llm
             logger.warning(f"Модель {cmd} не найдена среди моделей: {cli_s.names_llm}")
-            logger.warning(f"Выбрана дефолтная модель: {cli_s.default_llm}")
-            return cmd
+        logger.info(f"Выбрана модель: {cmd}")
+        return cmd
     except TimeoutError:
         logger.warning("Вы не ввели название модели")
     except ValueError:
         logger.warning("Ошибка: timeout должен быть > 0")
     except TypeError:
         logger.warning("Ошибка: timeout должен быть одним из типов: int, float, None")
-    logger.warning(f"Выбрана дефолтная модель: {cli_s.default_llm}")
     cmd = cli_s.default_llm
+    logger.warning(f"Выбрана дефолтная модель: {cmd}")
     return cmd
 
 
