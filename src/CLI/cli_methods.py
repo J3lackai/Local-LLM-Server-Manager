@@ -23,8 +23,9 @@ def input_llm_name_timeout(prompt: str, timeout: float, cli_s: CLISettings):
             return "n"
         if cmd not in cli_s.names_llm:
             logger.warning(f"Модель {cmd} не найдена среди моделей: {cli_s.names_llm}")
-        logger.info(f"Выбрана модель: {cmd}")
-        return cmd
+            cmd = cli_s.default_llm
+            logger.warning(f"Выбрана дефолтная модель: {cmd}")
+            return cmd
     except TimeoutError:
         logger.warning("Вы не ввели название модели")
     except ValueError:

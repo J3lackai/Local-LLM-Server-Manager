@@ -1,11 +1,11 @@
-from llm_model import LLMModel
-from utils import get_config_data, get_env_data, add_logger, wait_for_server
-from llm_server import LLMServerRunner, ServerData
-from loguru import logger
-from CLI import cli, input_llm_name_timeout, beautiful_exit
-
 if __name__ == "__main__":
     try:
+        from llm_model import LLMModel
+        from utils import get_config_data, get_env_data, add_logger, wait_for_server
+        from llm_server import LLMServerRunner, ServerData
+        from loguru import logger
+        from CLI import cli, input_llm_name_timeout, beautiful_exit
+
         # Убираем дефолтный логгер
         logger.remove()
         add_logger()
