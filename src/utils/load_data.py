@@ -4,6 +4,7 @@ from configparser import Error
 from configparser import ConfigParser
 from dataclasses import dataclass
 from loguru import logger
+from dotenv import load_dotenv
 
 
 @dataclass
@@ -92,4 +93,5 @@ def get_config_data(
 
 
 def get_env_data() -> str:
+    load_dotenv()
     return os.environ["psswrd"] if os.environ["psswrd"] else ""

@@ -38,6 +38,7 @@ MarkupSafe==3.0.3
 msgspec==0.19.0
 multidict==6.7.1
 numpy==2.4.3
+nvidia-ml-py==13.595.45
 optuna==4.7.0
 packaging==26.0
 pandas==3.0.1
@@ -52,6 +53,8 @@ pyinstaller-hooks-contrib==2026.3
 pynvml==13.0.1
 pyparsing==3.3.2
 python-dateutil==2.9.0.post0
+python-dotenv==1.2.2
+pywin32==311
 pywin32-ctypes==0.2.3
 PyYAML==6.0.3
 requests==2.32.5
@@ -63,6 +66,7 @@ tqdm==4.67.3
 typing-inspection==0.4.2
 typing_extensions==4.14.1
 tzdata==2025.3
+urllib3==2.6.3
 win32_setctime==1.2.0
 WMI==1.5.1
 wsproto==1.2.0
